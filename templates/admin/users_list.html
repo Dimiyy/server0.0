@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список пользователей</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Список пользователей</h1>
+        
+        {{if .Users}}
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Логин</th>
+                    <th>Должность</th>
+                    <th>Подразделение</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Роли</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Users}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td>{{.Login}}</td>
+                    <td>{{.Position}}</td>
+                    <td>{{.Department}}</td>
+                    <td>{{.Phone}}</td>
+                    <td>{{.Email}}</td>
+                    <td>
+                        {{range .Roles}}
+                        <span class="role-badge">{{.Role}}{{if .Department}} ({{.Department}}){{end}}</span>
+                        {{end}}
+                    </td>
+                    <td>
+                        <a href="/admin/assign-roles?user_id={{.ID}}" class="action-link">Назначить роли</a>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        {{else}}
+        <p>Нет зарегистрированных пользователей</p>
+        {{end}}
+        
+        <div class="actions">
+            <a href="/admin/register" class="btn">Добавить пользователя</a>
+            <a href="/admin" class="back-link">← Назад в панель администратора</a>
+        </div>
+    </div>
+</body>
+</html>

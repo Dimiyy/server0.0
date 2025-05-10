@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация пользователя</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Регистрация нового пользователя</h1>
+        
+        <form method="POST" class="admin-form">
+            <div class="form-group">
+                <label for="login">Логин:</label>
+                <input type="text" id="login" name="login" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="position">Должность:</label>
+                <input type="text" id="position" name="position" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="department">Подразделение:</label>
+                <select id="department" name="department" required>
+                    <option value="">Выберите подразделение</option>
+                    <option value="CCK">CCK</option>
+                    <option value="СГТМ">СГТМ</option>
+                    <option value="СПКР">СПКР</option>
+                    <option value="ГНКД">ГНКД</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+            </div>
+            
+            <button type="submit" class="btn">Зарегистрировать</button>
+        </form>
+        
+        <a href="/admin/users" class="back-link">← К списку пользователей</a>
+    </div>
+</body>
+</html>

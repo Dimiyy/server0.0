@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список заявок на транспорт</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-group input, .filter-group select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .filter-btn {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            background-color: #45a049;
+        }
+        .reset-btn {
+            padding: 8px 15px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .reset-btn:hover {
+            background-color: #d32f2f;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .details-row {
+            display: none;
+        }
+        .details-row.active {
+            display: table-row;
+        }
+        .details-table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+        .details-table th, .details-table td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .details-table th {
+            background-color: #f5f5f5;
+            position: sticky;
+            top: 0;
+        }
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #0066cc;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            font-size: inherit;
+        }
+        .toggle-btn:focus {
+            outline: none;
+        }
+        .back-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .back-btn:hover {
+            background-color: #45a049;
+        }
+        .no-applications {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+        .delete-btn {
+            padding: 8px 15px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .delete-btn:hover:not(:disabled) {
+            background-color: #d32f2f;
+        }
+        .delete-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        /* Стили для чекбоксов */
+        #selectAll, 
+        .select-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: 2px solid #4CAF50;
+            border-radius: 3px;
+            outline: none;
+            vertical-align: middle;
+            position: relative;
+        }
+        
+        /* Стиль для отмеченных чекбоксов */
+        #selectAll:checked, 
+        .select-checkbox:checked {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+        
+        /* Галочка для отмеченных чекбоксов */
+        #selectAll:checked::before,
+        .select-checkbox:checked::before {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Стиль для лейбла "Выбрать все" */
+        #selectAll + label {
+            cursor: pointer;
+            user-select: none;
+            vertical-align: middle;
+        }
+        
+        /* Выравнивание ячеек с чекбоксами */
+        #applicationsTable th:last-child,
+        #applicationsTable td:last-child {
+            text-align: center;
+            width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список заявок на транспорт</h1>
+    
+    <div class="filters">
+        <div class="filter-group">
+            <label for="appNumberFilter">Номер заявки</label>
+            <input type="text" id="appNumberFilter" placeholder="Введите номер">
+        </div>
+        
+        <div class="filter-group">
+            <label for="transportTypeFilter">Вид транспорта</label>
+            <select id="transportTypeFilter">
+                <option value="">Все</option>
+                <option value="passenger">Пассажирский</option>
+                <option value="cargo">Грузовой</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="periodFilter">Период работ</label>
+            <input type="text" id="periodFilter" placeholder="дд.мм.гггг или дд.мм.гггг-дд.мм.гггг">
+        </div>
+        
+        <button class="filter-btn" onclick="applyFilters()">Применить фильтры</button>
+        <button class="reset-btn" onclick="resetFilters()">Сбросить фильтры</button>
+        <button id="deleteSelectedBtn" class="delete-btn" disabled onclick="deleteSelected()">Удалить выбранные</button>
+        <a href="/" class="back-btn">Вернуться к заявке</a>
+    </div>
+    
+    {{if .}}
+    <table id="applicationsTable">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Номер заявки</th>
+                <th>Вид транспорта</th>
+                <th>Период работ</th>
+                <th>Подробная информация</th>
+                <th>
+                    <div style="text-align: center;">
+                        <input type="checkbox" id="selectAll">
+                        <label for="selectAll" style="margin-left: 5px; cursor: pointer;">Выбрать все</label>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range $index, $app := .}}
+            <tr class="application-row"
+                data-app-number="{{$app.AppNumber}}"
+                data-transport-type="{{$app.TransportType}}"
+                data-period="{{$app.Period}}">
+                <td>{{sub (len $) $index}}</td>
+                <td>{{$app.AppNumber}}</td>
+                <td>
+                    {{if eq $app.TransportType "passenger"}}
+                        Пассажирский
+                    {{else}}
+                        Грузовой
+                    {{end}}
+                </td>
+                <td>{{$app.Period}}</td>
+                <td>
+                    <button class="toggle-btn" onclick="toggleDetails(this)">Показать детали</button>
+                    <div class="details-content" style="display: none;">
+                        <table class="details-table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Маршрут</th>
+                                    <th>Характер работ</th>
+                                    <th>Состав</th>
+                                    <th>Комментарий</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range $detail := $app.Details}}
+                                <tr>
+                                    <td>{{$detail.Date}}</td>
+                                    <td>{{$detail.Track}}</td>
+                                    <td>{{$detail.Charecter}}</td>
+                                    <td>{{$detail.Workers}}</td>
+                                    <td>{{$detail.Comment}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+                <td style="text-align: center;">
+                    <input type="checkbox" class="select-checkbox" data-app-number="{{$app.AppNumber}}">
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    {{else}}
+    <div class="no-applications">Нет заявок на транспорт</div>
+    {{end}}
+
+
+    <script>
+        function getSelectedApplications() {
+            const selected = [];
+            document.querySelectorAll('.select-checkbox:checked').forEach(checkbox => {
+                selected.push(checkbox.getAttribute('data-app-number'));
+            });
+            return selected;
+        }       
+
+                // Добавьте этот код в секцию script
+        function updateDeleteButton() {
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            const selectedCount = document.querySelectorAll('.select-checkbox:checked').length;
+            deleteBtn.disabled = selectedCount === 0;
+        }
+
+        function setupCheckboxListeners() {
+            document.querySelectorAll('.select-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateDeleteButton);
+            });
+        }
+
+        function deleteSelected() {
+            const selected = getSelectedApplications();
+            if (selected.length === 0) return;
+
+            if (confirm(`Вы уверены, что хотите удалить ${selected.length} выбранных заявок?`)) {
+                // Отправка запроса на сервер для удаления
+                fetch('/delete-applications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({applications: selected})
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Заявки успешно удалены');
+                        location.reload(); // Перезагружаем страницу
+                    } else {
+                        throw new Error('Ошибка удаления');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при удалении');
+                });
+            }
+        }
+
+        // Инициализация после загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            setupCheckboxListeners();
+            updateDeleteButton();
+
+            // Обновляем обработчик для "Выбрать все"
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    document.querySelectorAll('.select-checkbox').forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateDeleteButton();
+                });
+            }
+        });
+        function toggleDetails(btn) {
+            const detailsContent = btn.nextElementSibling;
+            const isHidden = detailsContent.style.display === 'none';
+            
+            if (isHidden) {
+                // Сортируем таблицу по дате при раскрытии
+                const table = detailsContent.querySelector('table.details-table');
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                
+                rows.sort((a, b) => {
+                    const dateA = a.cells[0].textContent.trim();
+                    const dateB = b.cells[0].textContent.trim();
+                    return parseDate(dateA) - parseDate(dateB);
+                });
+                
+                // Очищаем и перезаполняем таблицу
+                const tbody = table.querySelector('tbody');
+                tbody.innerHTML = '';
+                rows.forEach(row => tbody.appendChild(row));
+            }
+            
+            detailsContent.style.display = isHidden ? 'block' : 'none';
+            btn.textContent = isHidden ? 'Скрыть детали' : 'Показать детали';
+        }
+    
+        // Функция для парсинга даты в формате дд.мм.гггг
+        function parseDate(dateStr) {
+            const [day, month, year] = dateStr.split('.');
+            return new Date(`${year}-${month}-${day}`);
+        }
+
+        // Применение фильтров
+        function applyFilters() {
+            const appNumberFilter = document.getElementById('appNumberFilter').value.toLowerCase();
+            const transportTypeFilter = document.getElementById('transportTypeFilter').value;
+            const periodFilter = document.getElementById('periodFilter').value.toLowerCase();
+            
+            document.querySelectorAll('.application-row').forEach(row => {
+                const appNumber = row.getAttribute('data-app-number').toLowerCase();
+                const transportType = row.getAttribute('data-transport-type');
+                const period = row.getAttribute('data-period').toLowerCase();
+                
+                // Проверка фильтра по номеру заявки
+                const appNumberMatch = appNumber.includes(appNumberFilter) || appNumberFilter === '';
+                
+                // Проверка фильтра по типу транспорта
+                const transportTypeMatch = transportType === transportTypeFilter || transportTypeFilter === '';
+                
+                // Проверка фильтра по периоду
+                let periodMatch = false;
+                if (periodFilter === '') {
+                    periodMatch = true;
+                } else if (periodFilter.includes('-')) {
+                    // Фильтр по диапазону дат (например, "01.01.2023-31.01.2023")
+                    const [startFilter, endFilter] = periodFilter.split('-').map(s => s.trim());
+                    const [startPeriod, endPeriod] = period.includes('-') 
+                        ? period.split('-').map(s => s.trim())
+                        : [period, period];
+                    
+                    const startFilterDate = parseDate(startFilter);
+                    const endFilterDate = parseDate(endFilter);
+                    const startPeriodDate = parseDate(startPeriod);
+                    const endPeriodDate = parseDate(endPeriod);
+                    
+                    periodMatch = (startPeriodDate >= startFilterDate && startPeriodDate <= endFilterDate) ||
+                                 (endPeriodDate >= startFilterDate && endPeriodDate <= endFilterDate) ||
+                                 (startPeriodDate <= startFilterDate && endPeriodDate >= endFilterDate);
+                } else {
+                    // Фильтр по конкретной дате (ищем вхождение в период)
+                    periodMatch = period.includes(periodFilter);
+                }
+                
+                // Показываем/скрываем строку в зависимости от соответствия фильтрам
+                row.style.display = (appNumberMatch && transportTypeMatch && periodMatch) 
+                    ? '' 
+                    : 'none';
+            });
+        }
+
+        // Сброс фильтров
+        function resetFilters() {
+            document.getElementById('appNumberFilter').value = '';
+            document.getElementById('transportTypeFilter').value = '';
+            document.getElementById('periodFilter').value = '';
+            applyFilters();
+        }
+
+        // Применение фильтров при нажатии Enter в полях ввода
+        document.getElementById('appNumberFilter').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') applyFilters();
+        });
+        document.getElementById('periodFilter').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') applyFilters();
+        });
+    </script>
+</body>
+</html>

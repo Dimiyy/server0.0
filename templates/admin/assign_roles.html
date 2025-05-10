@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Назначение ролей</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Назначение ролей пользователю</h1>
+        
+        <form method="POST" class="admin-form">
+            <div class="form-group">
+                <label for="user_id">Пользователь:</label>
+                <select id="user_id" name="user_id" required>
+                    <option value="">Выберите пользователя</option>
+                    {{range .Users}}
+                    <option value="{{.ID}}">{{.Login}} ({{.Position}}, {{.Department}})</option>
+                    {{end}}
+                </select>
+            </div>
+            
+            <div class="roles-container">
+                <h3>Роли:</h3>
+                
+                <div class="role-item">
+                    <label>
+                        <input type="checkbox" name="Руководитель ИТЦ">
+                        Руководитель ИТЦ
+                    </label>
+                </div>
+                
+                <div class="role-item">
+                    <label>
+                        <input type="checkbox" name="ГПТО ИТЦ">
+                        ГПТО ИТЦ
+                    </label>
+                </div>
+                
+                <div class="role-item">
+                    <label>
+                        <input type="checkbox" name="Руководитель СП ИТЦ">
+                        Руководитель СП ИТЦ
+                    </label>
+                    <div class="role-department">
+                        <label for="Руководитель СП ИТЦ_department">Подразделение:</label>
+                        <select id="Руководитель СП ИТЦ_department" name="Руководитель СП ИТЦ_department">
+                            <option value="">Все</option>
+                            <option value="CCK">CCK</option>
+                            <option value="СГТМ">СГТМ</option>
+                            <option value="СПКР">СПКР</option>
+                            <option value="ГНКД">ГНКД</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="role-item">
+                    <label>
+                        <input type="checkbox" name="Специалист СП ИТЦ">
+                        Специалист СП ИТЦ
+                    </label>
+                    <div class="role-department">
+                        <label for="Специалист СП ИТЦ_department">Подразделение:</label>
+                        <select id="Специалист СП ИТЦ_department" name="Специалист СП ИТЦ_department">
+                            <option value="">Все</option>
+                            <option value="CCK">CCK</option>
+                            <option value="СГТМ">СГТМ</option>
+                            <option value="СПКР">СПКР</option>
+                            <option value="ГНКД">ГНКД</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="role-item">
+                    <label>
+                        <input type="checkbox" name="УТТСТ">
+                        УТТСТ
+                    </label>
+                </div>
+                
+                <div class="role-item">
+                    <label>
+                        <input type="checkbox" name="ОК ИТЦ">
+                        ОК ИТЦ
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Сохранить роли</button>
+        </form>
+        
+        <a href="/admin/users" class="back-link">← К списку пользователей</a>
+    </div>
+</body>
+</html>

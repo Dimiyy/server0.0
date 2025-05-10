@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявки на транспорт</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .form-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .form-header {
+            display: grid;
+            grid-template-columns: 100px 200px 250px 150px 1fr;
+            background-color: #f2f2f2;
+            font-weight: bold;
+            padding: 10px 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .uniform-checkboxes {
+            display: grid;
+            grid-template-columns: 100px 200px 250px 150px 1fr;
+            padding: 5px 5px 5px 0;
+            background-color: #f8f8f8;
+        }
+        .uniform-checkboxes div {
+            display: flex;
+            align-items: center;
+            padding-left: 5px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 100px 200px 250px 150px 1fr;
+            padding: 10px 5px;
+            border-bottom: 1px solid #eee;
+        }
+        input, textarea, select {
+            width: 95%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 60px;
+            resize: vertical;
+        }
+        .btn {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .period-inputs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .period-inputs div {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+        .transport-type {
+            display: flex;
+            margin: 15px 0;
+            width: 300px;
+            gap: 20px;
+        }
+        .transport-option {
+            display: flex;
+            align-items: center;
+        }
+        .transport-option input {
+            width: auto;
+            margin-right: 8px;
+        }
+        .uniform-checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .uniform-checkbox-label:hover {
+            background-color: #f0f0f0;
+        }
+        .uniform-checkbox {
+            margin-right: 8px;
+            width: auto;
+            cursor: pointer;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        select.form-select {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+  <main class="form-container">
+    <h1>Заявка на транспорт</h1>
+    
+    <form action="/save_order" method="post" id="mainForm">
+      <div>
+        <label for="department_name">Подразделение</label>
+        <select name="department_name" id="department_name" class="form-select" required onchange="updateTeams()">
+          <option value="" selected disabled>Выберите подразделение</option>
+          <option value="CCK">CCK</option>
+          <option value="СГТМ">СГТМ</option>
+          <option value="СПКР">СПКР</option>
+          <option value="ГНКД">ГНКД</option>
+        </select>
+      </div>
+
+      <div class="transport-type">
+        <div class="transport-option">
+          <input type="radio" name="transportType" id="passengerRadio" value="passenger">
+          <label for="passengerRadio">Пассажирский</label>
+        </div>
+        <div class="transport-option">
+          <input type="radio" name="transportType" id="cargoRadio" value="cargo" checked>
+          <label for="cargoRadio">Грузовой</label>
+        </div>
+      </div>
+
+      <div class="period-inputs">
+        <div>
+          <label for="startDate">Начало периода</label>
+          <input type="date" id="startDate" name="startDate" required>
+        </div>
+        <div>
+          <label for="endDate">Окончание периода</label>
+          <input type="date" id="endDate" name="endDate" required>
+        </div>
+        <div style="align-self: flex-end;">
+          <button type="button" id="generateRowsBtn" class="btn">Сгенерировать дни</button>
+        </div>
+      </div>
+
+      <div id="formContainer">
+        <div class="form-header">
+            <div>Дата</div>
+            <div>Маршрут</div>
+            <div>Характер работ</div>
+            <div>Состав</div>
+            <div>Комментарий</div>
+        </div>
+        
+        <div class="uniform-checkboxes">
+            <div></div>
+            <div>
+                <label class="uniform-checkbox-label">
+                    <input type="checkbox" class="uniform-checkbox" id="uniformTrack"> единый
+                </label>
+            </div>
+            <div>
+                <label class="uniform-checkbox-label">
+                    <input type="checkbox" class="uniform-checkbox" id="uniformCharecter"> единый
+                </label>
+            </div>
+            <div>
+                <label class="uniform-checkbox-label">
+                    <input type="checkbox" class="uniform-checkbox" id="uniformWorkers"> единый
+                </label>
+            </div>
+            <div>
+                <label class="uniform-checkbox-label">
+                    <input type="checkbox" class="uniform-checkbox" id="uniformComment"> единый
+                </label>
+            </div>
+        </div>
+        
+        <div id="daysRowsContainer">
+          <!-- Сюда будут добавляться строки для дней -->
+        </div>
+      </div>
+      
+      <button type="submit" class="btn">Отправить заявку</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Данные о бригадах по подразделениям
+            const teamsByDivision = {
+                "CCK": [
+                    {value: "team1", label: "Бригада 1 (Иванов, Петров)"},
+                    {value: "team2", label: "Бригада 2 (Сидоров, Кузнецов)"}
+                ],
+                "СГТМ": [
+                    {value: "team3", label: "Бригада 3 (Смирнов, Попов)"},
+                    {value: "team4", label: "Бригада 4 (Васильев, Фёдоров)"}
+                ],
+                "СПКР": [
+                    {value: "team5", label: "Бригада 5 (Николаев, Орлов)"}
+                ],
+                "ГНКД": [
+                    {value: "team6", label: "Бригада 6 (Лебедев, Соколов)"},
+                    {value: "team7", label: "Бригада 7 (Волков, Зайцев)"}
+                ]
+            };
+        
+            // Форматирование даты в DD.MM.YYYY
+            function formatDate(date) {
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}.${month}.${year}`;
+            }
+        
+            // Обновление списка бригад при выборе подразделения
+            function updateTeams() {
+                const division = document.getElementById('department_name').value;
+                const teamSelects = document.querySelectorAll('.team-select');
+
+                teamSelects.forEach(select => {
+                    const selectedValue = select.value;
+                    select.innerHTML = '<option value="" disabled selected>Выберите состав...</option>';
+
+                    if (division && teamsByDivision[division]) {
+                        teamsByDivision[division].forEach(team => {
+                            const option = document.createElement('option');
+                            option.value = team.value;
+                            option.textContent = team.label;
+                            select.appendChild(option);
+                        });
+
+                        if (selectedValue && [...select.options].some(opt => opt.value === selectedValue)) {
+                            select.value = selectedValue;
+                        }
+                    }
+                });
+            }
+        
+            // Синхронизация данных при изменении первой строки
+            function syncIfChecked(e) {
+                const fieldName = e.target.name;
+                const checkboxId = {
+                    'tracks[]': 'uniformTrack',
+                    'charecters[]': 'uniformCharecter',
+                    'workers[]': 'uniformWorkers',
+                    'comments[]': 'uniformComment'
+                }[fieldName];
+
+                if (document.getElementById(checkboxId)?.checked) {
+                    const value = e.target.value;
+                    document.querySelectorAll(`[name="${fieldName}"]`).forEach(field => {
+                        if (field !== e.target) field.value = value;
+                    });
+                }
+            }
+        
+            // Настройка обработчиков для чекбоксов "единый"
+            function setupUniformHandlers() {
+                // Обработчик для Маршрута
+                document.getElementById('uniformTrack').addEventListener('change', function() {
+                    if (this.checked) {
+                        const firstTrack = document.querySelector('input[name="tracks[]"]');
+                        if (firstTrack?.value) {
+                            document.querySelectorAll('input[name="tracks[]"]').forEach(input => {
+                                if (input !== firstTrack) input.value = firstTrack.value;
+                            });
+                        }
+                    }
+                });
+            
+                // Обработчик для Характера работ
+                document.getElementById('uniformCharecter').addEventListener('change', function() {
+                    if (this.checked) {
+                        const firstCharecter = document.querySelector('input[name="charecters[]"]');
+                        if (firstCharecter?.value) {
+                            document.querySelectorAll('input[name="charecters[]"]').forEach(input => {
+                                if (input !== firstCharecter) input.value = firstCharecter.value;
+                            });
+                        }
+                    }
+                });
+            
+                // Обработчик для Состава
+                document.getElementById('uniformWorkers').addEventListener('change', function() {
+                    if (this.checked) {
+                        const firstWorker = document.querySelector('select[name="workers[]"]');
+                        if (firstWorker?.value) {
+                            document.querySelectorAll('select[name="workers[]"]').forEach(select => {
+                                if (select !== firstWorker) select.value = firstWorker.value;
+                            });
+                        }
+                    }
+                });
+            
+                // Обработчик для Комментария
+                document.getElementById('uniformComment').addEventListener('change', function() {
+                    if (this.checked) {
+                        const firstComment = document.querySelector('textarea[name="comments[]"]');
+                        if (firstComment?.value) {
+                            document.querySelectorAll('textarea[name="comments[]"]').forEach(textarea => {
+                                if (textarea !== firstComment) textarea.value = firstComment.value;
+                            });
+                        }
+                    }
+                });
+            }
+        
+            // Генерация строк для периода
+            document.getElementById('generateRowsBtn').addEventListener('click', function() {
+                const startDate = new Date(document.getElementById('startDate').value);
+                const endDate = new Date(document.getElementById('endDate').value);
+
+                if (!startDate || !endDate) {
+                    alert("Укажите начальную и конечную даты!");
+                    return;
+                }
+
+                if (startDate > endDate) {
+                    alert("Дата окончания должна быть после даты начала!");
+                    return;
+                }
+            
+                const container = document.getElementById('daysRowsContainer');
+                container.innerHTML = '';
+            
+                const currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    const dateStr = formatDate(currentDate);
+
+                    const row = document.createElement('div');
+                    row.className = 'form-row';
+                    row.innerHTML = `
+                        <div><input type="text" name="dates[]" value="${dateStr}" readonly></div>
+                        <div><input type="text" name="tracks[]" placeholder="Маршрут"></div>
+                        <div><input type="text" name="charecters[]" placeholder="Характер работ"></div>
+                        <div>
+                            <select name="workers[]" class="team-select">
+                                <option value="" disabled selected>Выберите состав...</option>
+                            </select>
+                        </div>
+                        <div><textarea name="comments[]" placeholder="Комментарий"></textarea></div>
+                    `;
+                    
+                    container.appendChild(row);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+            
+                updateTeams();
+                setupUniformHandlers();
+
+                // Добавляем обработчики для первой строки
+                const firstRow = container.firstElementChild;
+                if (firstRow) {
+                    firstRow.querySelector('input[name="tracks[]"]')?.addEventListener('input', syncIfChecked);
+                    firstRow.querySelector('input[name="charecters[]"]')?.addEventListener('input', syncIfChecked);
+                    firstRow.querySelector('select[name="workers[]"]')?.addEventListener('change', syncIfChecked);
+                    firstRow.querySelector('textarea[name="comments[]"]')?.addEventListener('input', syncIfChecked);
+                }
+            });
+        
+            // Инициализация при загрузке
+            document.getElementById('department_name').addEventListener('change', updateTeams);
+            document.getElementById('startDate').valueAsDate = new Date();
+            document.getElementById('endDate').valueAsDate = new Date();
+            setupUniformHandlers();
+        });
+            </script>
+  </main>
+</body>
+</html>

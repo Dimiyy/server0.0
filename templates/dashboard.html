@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система управления заявками ИТЦ</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">АРМ ИТЦ</div>
+        <div class="user-info">
+            <span class="user-name">Иванов И.И.</span>
+            <button class="logout-btn">Выйти</button>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="admin">Администратор</div>
+        <div class="tab" data-tab="itc-head">Руководитель ИТЦ</div>
+        <div class="tab" data-tab="gpto-itc">ПТО ИТЦ</div>
+        <div class="tab" data-tab="sp-head">Руководитель СП ИТЦ</div>
+        <div class="tab" data-tab="sp-specialist">Специалист СП ИТЦ</div>
+        <div class="tab" data-tab="utts">УТТСТ</div>
+        <div class="tab" data-tab="ok-itc">ОК ИТЦ</div>
+    </div>
+    
+    <div class="content">
+        <div id="admin" class="tab-content active">
+            <h2>Панель администратора</h2>
+            <p>Здесь будет интерфейс для управления пользователями и настройками системы.</p>
+        </div>
+        
+        <div id="itc-head" class="tab-content">
+            <h2>Руководитель ИТЦ</h2>
+            <p>Интерфейс для утверждения заявок и просмотра отчетов.</p>
+        </div>
+        
+        <div id="gpto-itc" class="tab-content">
+            <h2>Группа ПТО</h2>
+            <p>Интерфейс для работы с графиками и планированием.</p>
+        </div>
+        
+        <div id="sp-head" class="tab-content">
+            <h2>Руководитель СП ИТЦ</h2>
+            <p>Интерфейс для контроля заявок от специалистов СП.</p>
+        </div>
+        
+        <div id="sp-specialist" class="tab-content">
+            <h2>Специалист СП ИТЦ</h2>
+            <iframe src="/transport-request" style="width: 100%; height: 800px; border: none;"></iframe>
+        </div>
+        
+        <div id="utts" class="tab-content">
+            <h2>УТТСТ</h2>
+            <p>Интерфейс для управления транспортными средствами.</p>
+        </div>
+        
+        <div id="ok-itc" class="tab-content">
+            <h2>ОК ИТЦ</h2>
+            <p>Интерфейс для кадрового учета и отчетности.</p>
+        </div>
+    </div>
+    
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
